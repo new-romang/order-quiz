@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>발주관리 계산식 퀴즈</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --card:#ffffff; --ink:#1f2328; --muted:#6b7280; --line:#e5e7eb;
+  --accent:#1f3864; --rocket:#9a4a14; --rocket-bg:#fbeee4; --other:#2f6b2a; --other-bg:#e9f3e6;
+  --good:#1e7a46; --good-bg:#e5f4ea; --bad:#b3261e; --bad-bg:#fbe9e7; --chip:#f3f4f6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16181c; --card:#1f2228; --ink:#e8e6e1; --muted:#a2a39f; --line:#33363d;
+    --accent:#8fb0ea; --rocket:#f0a874; --rocket-bg:#3a2617; --other:#9fd796; --other-bg:#1d3320;
+    --good:#7fd6a0; --good-bg:#173726; --bad:#ff9b8f; --bad-bg:#3d1c19; --chip:#2a2d34;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16181c; --card:#1f2228; --ink:#e8e6e1; --muted:#a2a39f; --line:#33363d;
+  --accent:#8fb0ea; --rocket:#f0a874; --rocket-bg:#3a2617; --other:#9fd796; --other-bg:#1d3320;
+  --good:#7fd6a0; --good-bg:#173726; --bad:#ff9b8f; --bad-bg:#3d1c19; --chip:#2a2d34;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6;font-size:15px}
+.wrap{max-width:760px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:24px;margin:0 0 4px;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:0 0 22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px;margin-bottom:16px}
+.card h2{font-size:16px;margin:0 0 10px}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
+.flow span.s{background:var(--chip);border-radius:999px;padding:3px 10px}
+.flow span.a{color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--line);padding:6px 6px;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:500}
+.r{color:var(--rocket)} .o{color:var(--other)}
+.tag{display:inline-block;font-size:12px;border-radius:6px;padding:1px 7px;margin-right:4px}
+.tag.r{background:var(--rocket-bg)} .tag.o{background:var(--other-bg)}
+.scroll{overflow-x:auto}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}
+.kv div{background:var(--chip);border-radius:10px;padding:8px 10px;font-size:13px}
+.kv b{display:block;font-size:16px}
+.progress{height:6px;background:var(--chip);border-radius:999px;overflow:hidden;margin:6px 0 14px}
+.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.qhead{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
+.q{font-size:17px;font-weight:700;margin:6px 0 4px}
+.qnote{color:var(--muted);font-size:13px;margin-bottom:12px;white-space:pre-line}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:11px 13px;font:inherit;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt:disabled{cursor:default}
+.exp{margin-top:12px;border-left:3px solid var(--accent);padding:6px 12px;background:var(--chip);border-radius:0 10px 10px 0;white-space:pre-line;font-size:14px}
+.exp .v{font-weight:700}
+.row{display:flex;gap:8px;justify-content:space-between;margin-top:14px;flex-wrap:wrap}
+.btn{border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--accent);color:#fff}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
+.hint{font-size:13px;color:var(--muted);margin-top:8px}
+.result h2{font-size:20px}
+.list{margin:8px 0 0;padding-left:18px;font-size:14px}
+footer{color:var(--muted);font-size:12px;margin-top:24px}
+@media (max-width:520px){.q{font-size:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>발주관리 계산식 퀴즈</h1>
+  <p class="sub">실제 상품 하나로 원본 → 가중4주 → 필요재고 → 추천수량까지 따라갑니다. 문제의 숫자는 모두 바로 아래 예시 상품에서 나옵니다.</p>
+
+
+
+
+  <div class="card">
+    <h2>예시 상품 · 00317 머리띠 012 대왕생선</h2>
+    <div class="scroll">
+    <table>
+      <thead><tr><th>최근 4주 판매 (원본)</th><th>10/1주<br>(9/28~)</th><th>10/2주<br>(10/5~)</th><th>10/3주<br>(10/12~)</th><th>10/4주<br>(10/19~, 최근)</th><th>합계</th></tr></thead>
+      <tbody>
+        <tr><td class="r">로켓 (쿠팡로켓배송)</td><td>0</td><td>30</td><td>0</td><td>30</td><td>60</td></tr>
+        <tr><td class="o">나머지 (G마켓·스마트스토어·쿠팡3p)</td><td>4</td><td>3</td><td>8</td><td>11</td><td>26</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="kv">
+      <div>작년 12개월 판매<b><span class="r">로켓 560</span> · <span class="o">나머지 88</span></b></div>
+      <div>판매기간<b>364일 (12개월)</b></div>
+      <div>이번 달(10월) 지수<b>0.8</b></div>
+      <div>입고월(11월) 지수<b>1.2</b></div>
+      <div>리드타임 / 발주주기 / 안전재고<b>30 / 0 / 30일</b></div>
+      <div>가용재고 / 발주로그 미입고<b>23 / 0</b></div>
+    </div>
+    <p class="hint">시즌지수 = 작년 그 달 하루 판매 ÷ 평소 하루 판매, 0.8~1.2로 제한. 이 상품은 10월이 평소보다 적고(하한 0.8) 11월이 많습니다(상한 1.2).</p>
+  </div>
+
+  <div class="card" id="quiz">
+    <div class="qhead"><span id="qnum"></span><span id="score"></span></div>
+    <div class="progress"><i id="bar"></i></div>
+    <div id="qbody"></div>
+  </div>
+
+  <div class="card">
+    <h2>계산 흐름 한눈에</h2>
+    <div class="flow">
+      <span class="s">최근4주 원본 (그대로)</span><span class="a">→</span>
+      <span class="s">최근가중 4주 (1.2 / 1.1 / 1 / 1)</span><span class="a">→</span>
+      <span class="s">가중4주 = 최근가중×비중 + 시즌기대×(1−비중)</span><span class="a">→</span>
+      <span class="s">입고 전·후 일평균(예측)</span><span class="a">→</span>
+      <span class="s">필요재고</span><span class="a">→</span>
+      <span class="s">추천수량 · 상태</span>
+    </div>
+    <p class="hint">로켓과 나머지 채널을 따로 계산하고, 추천수량에서만 합칩니다. 최근 비중: <span class="tag r">로켓 20%</span><span class="tag o">나머지 90%</span></p>
+  </div>
+
+  <footer>정답 해설의 숫자는 실제 시트 계산값과 같습니다. 반올림 때문에 소수점 차이가 날 수 있어요.</footer>
+</div>
+
+<script>
+const Q = [
+ {q:"[로켓 최근4주] 칸에 보이는 숫자는?", note:"원본 표의 로켓 줄을 보세요.",
+  o:["60","66","41","30"], a:0,
+  e:"최근4주 칸은 원본을 <span class='v'>계산 없이 그대로</span> 더합니다.\n0 + 30 + 0 + 30 = <span class='v'>60</span>\n모든 가중·시즌 계산은 그 오른쪽 '가중4주'에서 일어납니다."},
+ {q:"로켓 [최근가중 4주]는?", note:"가장 최근 주 × 1.2, 두 번째 주 × 1.1, 나머지 두 주는 그대로.\n(모든 주가 7일 꽉 찬 경우라 일평균×7 = 그 주 판매)",
+  o:["60","66","69","72"], a:1,
+  e:"최근(10/4주) 30 × 1.2 = 36\n두 번째(10/3주) 0 × 1.1 = 0\n10/2주 30 + 10/1주 0 = 30\n합계 = <span class='v'>66</span>  (원본 60보다 최근 쪽이 조금 더 커짐)"},
+ {q:"나머지 [최근가중 4주]는?", note:"나머지 주별 합: 4 / 3 / 8 / 11 (오래된 → 최근)",
+  o:["26","28.6","29","31.2"], a:2,
+  e:"최근 11 × 1.2 = 13.2\n두 번째 8 × 1.1 = 8.8\n그대로 3 + 4 = 7\n합계 = <span class='v'>29</span>"},
+ {q:"로켓 [시즌 기대 4주]는?", note:"시트에 따로 열은 없고, [로켓 가중4주] 수식 안에서 계산되는 중간값입니다.\n시즌 기대 = [로켓 평소 하루] × 28 × [이번달 지수]  (둘 다 발주추천 오른쪽 계산 참고 열)\n평소 하루 = 작년 12개월 ÷ 판매기간(일)",
+  o:["약 43.1","약 34.5","약 51.7","약 28"], a:1,
+  e:"평소 하루 = 560 ÷ 364 = 1.538개\n평소 4주 = 1.538 × 28 = 43.1\n이맘때(10월) = 43.1 × 0.8 = <span class='v'>34.5</span>\n'작년 이맘때라면 4주에 이만큼 팔렸을 것'이라는 기대치입니다."},
+ {q:"로켓 [가중4주]는?", note:"로켓 최근 비중 20%\n가중4주 = 최근가중 × 20% + 시즌 기대 × 80%",
+  o:["66","50","41","35"], a:2,
+  e:"66 × 0.2 = 13.2\n34.5 × 0.8 = 27.6\n합계 40.8 → 반올림 <span class='v'>41</span>\n로켓은 PO가 몰렸다 비었다 해서 최근(66)보다 작년 패턴을 더 믿습니다."},
+ {q:"나머지 [가중4주]는?", note:"나머지 최근 비중 90%. 나머지 평소 하루 = 88 ÷ 364 = 0.242",
+  o:["29","27","26","24"], a:1,
+  e:"최근 몫: 29 × 0.9 = 26.1\n시즌 기대: 0.242 × 28 × 0.8 = 5.4 → × 0.1 = 0.54\n합계 26.64 → <span class='v'>27</span>\n나머지는 시즌이 10%만 들어가서 거의 최근가중대로 갑니다."},
+ {q:"[입고 전 일평균(예측)]은?", note:"앞으로 입고 전까지 하루에 팔릴 것으로 예측한 수량입니다. (실제로 팔린 속도는 최근4주 원본 ÷ 28)",
+  o:["(60+26) ÷ 28 = 3.07","(41+27) ÷ 28 = 2.43","(66+29) ÷ 28 = 3.39","41 ÷ 28 = 1.46"], a:1,
+  e:"입고 전 일평균(예측) = (로켓 가중4주 + 나머지 가중4주) ÷ 28\n= 68 ÷ 28 = <span class='v'>2.43개/일</span>\n실제 속도는 (60+26) ÷ 28 = 3.07개지만, 로켓 PO 덩어리를 작년 패턴으로 눌러서 예측은 2.43개입니다."},
+ {q:"[입고 후 일평균(예측)]이 입고 전(2.43)보다 큰 2.91로 나왔습니다. 가장 큰 이유는?", note:"입고 후 일평균 = 가중4주와 같은 식, 시즌 기대에만 '입고월 지수' 사용",
+  o:["리드타임이 30일이라서","입고월(11월) 지수 1.2가 이번 달 0.8보다 커서, 시즌 비중 80%인 로켓 몫이 크게 오름","나머지 채널 최근 주가 늘어서","안전재고가 들어가서"], a:1,
+  e:"로켓: 66÷28×0.2 = 0.47 + 1.538×<b>1.2</b>×0.8 = 1.48 → 1.95\n나머지: 29÷28×0.9 = 0.93 + 0.242×1.2×0.1 = 0.03 → 0.96\n합계 = <span class='v'>2.91</span>\n지수가 0.8 → 1.2로 바뀐 효과가 시즌 비중이 큰 로켓에서 주로 나타납니다."},
+ {q:"[필요재고]는?", note:"필요재고 = 입고 전 일평균 × 리드타임 + 입고 후 일평균 × (발주주기 + 안전재고)",
+  o:["2.43 × 60 = 146","2.43 × 30 + 2.91 × 30 = 160","2.91 × 60 = 175","(2.43 + 2.91) × 30 × 1.3 = 208"], a:1,
+  e:"입고 전 30일: 2.43 × 30 = 72.9\n입고 후 버틸 30일: 2.91 × (0 + 30) = 87.3\n합계 = <span class='v'>160</span>"},
+ {q:"[발주 추천수량]과 [상태]는?", note:"가용재고 23, 발주로그 미입고 0, 박스입수·MOQ 없음\n재고 버티는 일수 = 발주시점 가용재고 ÷ 실제 일평균(최근4주 원본 ÷ 28)",
+  o:["137 · 발주","137 · 긴급","160 · 긴급","183 · 발주"], a:1,
+  e:"추천 = 160 − (23 + 0) = <span class='v'>137</span>\n버티는 일수 = 23 ÷ 3.07(실제 일평균) = 7일 < 리드타임 30일 → <span class='v'>긴급</span>\n지금 발주해도 입고 전에 재고가 바닥나는 상품입니다."},
+ {q:"상품마스터에서 이 상품 [안전재고(일)]에 45를 넣으면 추천수량은?", note:"빈칸이면 설정값(30일)을 따릅니다.",
+  o:["137 그대로","약 160","약 181","약 204"], a:2,
+  e:"필요재고 = 2.43 × 30 + 2.91 × (0 + 45) = 72.9 + 130.9 = 204\n추천 = 204 − 23 = <span class='v'>181</span>\n발주주기·리드타임·안전재고 모두 상품마스터 값이 있으면 그 값, 비어 있으면 설정값."},
+ {q:"수요일(10/28)에 받은 파일이라 맨 끝에 10/5주(10/26~) 열이 생기고, 로켓이 월·화 이틀 동안 10개 팔렸다면? 이 주의 최근가중 기여분은?", note:"판매는 다음날 반영 → 수요일 파일 = 월·화 2일치",
+  o:["10 × 1.2 = 12","10 ÷ 2 × 1.2 × 7 = 42","10 ÷ 7 × 1.2 × 7 = 12","10 × 7 = 70"], a:1,
+  e:"덜 끝난 주는 '지난 일수'로 일평균을 냅니다: 10 ÷ 2 = 5개/일\n최근 1주 가중 × 7일: 5 × 1.2 × 7 = <span class='v'>42</span>\n이때 순위가 한 칸씩 밀려 10/4주가 ×1.1, 9/28주는 4주 밖으로 빠집니다.\n설정 [최근4주 받은 날]이 실제 받은 날과 같아야 일수가 맞게 계산돼요."},
+ {q:"이 상품이 판매 시작 3개월 된 신상품이었다면 로켓 가중4주와 안전재고는?", note:"신상품 = 판매기간 4개월 미만",
+  o:["41 · 30일","66 · 39일","60 · 39일","66 · 30일"], a:1,
+  e:"신상품은 작년 패턴이 없어 시즌을 쓰지 않고 <span class='v'>최근가중 100%</span> → 66\n대신 예측이 불안정한 만큼 안전재고 30 × 130% = <span class='v'>39일</span>\n4개월이 지나면 자동으로 일반 계산(로켓 20% / 나머지 90%)으로 바뀝니다."},
+ {q:"로켓 최근 비중을 20%에서 50%로 바꾸고 싶다면 어디서?", note:"",
+  o:["상품마스터 각 상품 행","설정 시트 [로켓 최근 비중] 한 칸","판매처비중 시트","계산_4주 시트"], a:1,
+  e:"설정의 <span class='v'>[로켓 최근 비중]</span>과 [나머지 최근 비중] 한 칸씩만 바꾸면 전체에 반영됩니다.\n과거 1년 시험에서는 로켓 20%, 나머지 80~90%가 가장 정확했습니다."}
+];
+let i=0, score=0, answered=false, wrong=[];
+const $=id=>document.getElementById(id);
+function render(){
+  if(i>=Q.length) return finish();
+  const d=Q[i]; answered=false;
+  $('qnum').textContent=`문제 ${i+1} / ${Q.length}`;
+  $('score').textContent=`맞힌 문제 ${score}`;
+  $('bar').style.width=(i/Q.length*100)+'%';
+  $('qbody').innerHTML=`<div class="q">${d.q}</div>${d.note?`<div class="qnote">${d.note}</div>`:''}
+    <div class="opts">${d.o.map((t,k)=>`<button class="opt" data-k="${k}">${t}</button>`).join('')}</div>
+    <div id="exp"></div><div class="row"><span></span><button class="btn" id="next" style="display:none">다음 문제</button></div>`;
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+  $('next').onclick=()=>{i++;render();};
+}
+function pick(k){
+  if(answered) return; answered=true;
+  const d=Q[i], ok=k===d.a;
+  if(ok) score++; else wrong.push(i);
+  document.querySelectorAll('.opt').forEach(b=>{
+    const kk=+b.dataset.k; b.disabled=true;
+    if(kk===d.a) b.classList.add('ok'); else if(kk===k) b.classList.add('no');
+  });
+  $('exp').innerHTML=`<div class="exp"><b>${ok?'정답!':'다시 볼게요.'}</b>\n${d.e}</div>`;
+  $('next').style.display='inline-block';
+  $('next').textContent=i===Q.length-1?'결과 보기':'다음 문제';
+  $('score').textContent=`맞힌 문제 ${score}`;
+}
+function finish(){
+  $('bar').style.width='100%'; $('qnum').textContent='완료'; $('score').textContent='';
+  $('qbody').innerHTML=`<div class="result"><h2>${Q.length}문제 중 ${score}문제 정답</h2>
+   ${wrong.length?`<p>다시 볼 문제:</p><ul class="list">${wrong.map(w=>`<li>${w+1}. ${Q[w].q}</li>`).join('')}</ul>`:'<p>전부 맞혔어요. 계산 흐름을 끝까지 따라갈 수 있습니다.</p>'}
+   <div class="row"><button class="btn ghost" id="again">처음부터 다시</button></div></div>`;
+  $('again').onclick=()=>{i=0;score=0;wrong=[];render();};
+}
+render();
+</script>
+</body>
+</html>
